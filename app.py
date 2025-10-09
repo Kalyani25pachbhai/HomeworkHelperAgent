@@ -78,7 +78,7 @@ def get_retriever():
             return None 
     return None
 
-def homework_helper(query, retriever=None, uploaded_filename=None):
+def homework_helper(query, retriever=None):
     general_agent_prompt = f"""
     You are a Homework Helper. Explain the answer to the following question in a systematic, easy-to-read format. 
     Use a clear markdown structure, including bolding, headings, and bullet points.
@@ -86,27 +86,18 @@ def homework_helper(query, retriever=None, uploaded_filename=None):
     Question: {query}
     """
 
-    if uploaded_filename == "30925SamplePaper.pdf" and os.path.exists(PDF_PATH):
-        try:
-            loader = PyPDFLoader(PDF_PATH)
-            full_docs = loader.load()
-            first_page_content = full_docs[0].page_content 
-            
-            extraction_prompt = (
-                "You are an expert fact extractor. Answer the user's question based ONLY on the provided context."
-                "If the context does not contain the answer, state 'I cannot find the information in the notes.' Do not paraphrase."
-                f"\n\n--- Context ---\n\n{first_page_content}\n\nQuestion: {query}"
-            )
-            return llm.invoke(extraction_prompt).content
-            
-        except Exception as e:
-            print(f"Direct PDF extraction failed: {e}. Falling back to general agent.")
-            return agent.run(general_agent_prompt)
-            
-    elif retriever:
+    if retriever:
         try:
             qa = RetrievalQA.from_chain_type(llm=llm, retriever=retriever, chain_type="stuff")
-            return qa.run(query) 
+            
+            strict_rag_query = (
+                f"Answer the following question based ONLY on the provided context. "
+                f"Be hyper-specific: if the answer is a name, number, or date, provide the literal text found in the notes. "
+                f"If the answer is a list, provide the complete list. If not found, say 'Not found in notes'. "
+                f"Question: {query}"
+            )
+            
+            return qa.run(strict_rag_query) 
             
         except Exception as e:
             print(f"Retrieval QA failed: {e}. Falling back to general agent.")
@@ -142,7 +133,8 @@ def ask():
             print(f"Error processing PDF: {e}")
             session.pop('uploaded_filename', None)
             
-            answer = homework_helper(question, uploaded_filename=None)
+            # Removed uploaded_filename argument here
+            answer = homework_helper(question)
             return render_template("index.html", 
                                    question=question, 
                                    answer=f"⚠️ Error processing your notes. The system encountered an error: '{e}'. Answering using public knowledge instead.",
@@ -151,7 +143,8 @@ def ask():
     else:
         retriever = get_retriever()
         
-    answer = homework_helper(question, retriever, uploaded_filename)
+    # Removed uploaded_filename argument here
+    answer = homework_helper(question, retriever)
     
     return render_template("index.html", 
                            question=question, 
