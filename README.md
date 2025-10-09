@@ -25,7 +25,7 @@ The system will extract information from your notes, search Wikipedia if needed,
 
 **🏗️ Tech Stack**
 
-Frontend: Streamlit (or HTML & CSS if you later use Flask UI)
+Frontend: HTML, CSS & Flask UI
 
 Backend: Python
 
