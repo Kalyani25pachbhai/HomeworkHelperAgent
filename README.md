@@ -1,4 +1,4 @@
-**📘 Smart Homework Helper**
+**📘 SMART HOMEWORK HELPER**
 
 An AI-powered homework assistant that helps students get step-by-step explanations for any question.
 It can also read and understand your uploaded PDF notes to give context-based answers — just like a personalized tutor!
