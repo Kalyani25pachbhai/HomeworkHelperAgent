@@ -13,8 +13,8 @@ app = Flask(__name__)
 
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "a_strong_secret_key_for_demo") 
 
-PDF_PATH = "notes.pdf"
-DB_PATH = "faiss_db"
+PDF_PATH = "/tmp/notes.pdf"
+DB_PATH = "/tmp/faiss_db"
 
 os.environ["GOOGLE_API_KEY"] = "AIzaSyDJx6Qkp6xa7r1I-3Fb5w68RyqBadL74_s" 
 
